@@ -1,0 +1,30 @@
+/* Style untuk tab bootstrap */
+.nav-tabs {
+    background-color: white; /* background putih */
+    border-bottom: 1px solid #dee2e6; /* garis default */
+}
+
+.nav-tabs .nav-link {
+    color: black; /* teks non-active hitam */
+    border: 1px solid transparent; /* biar border tetap rapi */
+    border-bottom: none; /* hilangkan border bawah supaya nyambung ke konten */
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+    color: #ff6c37 !important; /* teks active orange */
+    border-color: #dee2e6 #dee2e6 #fff; /* border atas/kiri/kanan default */
+    background-color: white; /* tetap putih */
+}
+
+.btn-outline-orange {
+    color: #ff6c37; /* teks orange */
+    border: 1px solid #ff6c37; /* garis orange */
+    background-color: transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-orange:hover {
+    background-color: #ff6c37; /* background orange saat hover */
+    color: white; /* teks putih saat hover */
+}
