@@ -1,13 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 
 const Sidebar = () => {
+    const [openMenu, setOpenMenu] = useState(null);
+
     const menus = [
         { name: "Kunjungan", path: "/kunjungan" },
-        { name: "Pemeriksaan", path: "/pemeriksaan" },
-        { name: "Hasil Lab", path: "/hasil-lab" },
+        { name: "Pemeriksaan", path: "/kunjungan" },
+        { name: "Laboratorium", path: "/hasil-lab" },
+        {
+            name: "Machine Learning",
+            subMenus: [
+                { name: "Dataset", path: "/dataset" },
+                { name: "Evaluasi Model", path: "/evaluasi-model" },
+            ],
+        },
     ];
+
+    const toggleSubMenu = (index) => {
+        setOpenMenu(openMenu === index ? null : index);
+    };
 
     return (
         <div
@@ -24,31 +37,78 @@ const Sidebar = () => {
                 fontFamily: "'Times New Roman', Times, serif",
             }}
         >
-            <ul className="nav flex-column mb-auto" style={{ lineHeight: "1.3" }}>
+            <ul className="nav flex-column mb-auto" style={{ lineHeight: "1.2" }}>
                 {menus.map((menu, index) => (
-                    <li
-                        className="nav-item"
-                        key={index}
-                        style={{
-                            marginBottom: "4px", // 🔹 jarak antar item lebih rapat
-                        }}
-                    >
-                        <Link
-                            to={menu.path}
-                            className="nav-link"
-                            style={{
-                                color: "#000", // hitam sesuai preferensimu
-                                fontWeight: "500",
-                                fontSize: "1rem",
-                                backgroundColor: "transparent",
-                                paddingLeft: "0",
-                                textDecoration: "none",
-                                paddingTop: "2px",
-                                paddingBottom: "2px",
-                            }}
-                        >
-                            {menu.name}
-                        </Link>
+                    <li key={index} className="nav-item" style={{ marginBottom: "2px" }}>
+                        {menu.subMenus ? (
+                            <>
+                                <button
+                                    className="btn btn-link text-start w-100"
+                                    onClick={() => toggleSubMenu(index)}
+                                    style={{
+                                        color: "#000",
+                                        fontWeight: "500",
+                                        fontSize: "0.95rem",
+                                        textDecoration: "none",
+                                        padding: "2px 0",
+                                        margin: "0",
+                                    }}
+                                >
+                                    {menu.name}
+                                </button>
+
+                                {/* Submenu dengan garis penghubung titik-titik */}
+                                {openMenu === index && (
+                                    <ul
+                                        className="nav flex-column ms-3"
+                                        style={{
+                                            marginTop: "4px",
+                                            borderLeft: "1px dotted #aaa", // 🔹 garis penghubung vertikal
+                                            paddingLeft: "10px",
+                                        }}
+                                    >
+                                        {menu.subMenus.map((sub, subIndex) => (
+                                            <li
+                                                key={subIndex}
+                                                className="nav-item"
+                                                style={{
+                                                    marginBottom: "2px",
+                                                    borderBottom: "1px dotted #ccc", // 🔹 garis horizontal antar submenu
+                                                    paddingBottom: "2px",
+                                                }}
+                                            >
+                                                <Link
+                                                    to={sub.path}
+                                                    className="nav-link"
+                                                    style={{
+                                                        color: "#333",
+                                                        fontSize: "0.9rem",
+                                                        textDecoration: "none",
+                                                        padding: "1px 0",
+                                                    }}
+                                                >
+                                                    {sub.name}
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </>
+                        ) : (
+                            <Link
+                                to={menu.path}
+                                className="nav-link"
+                                style={{
+                                    color: "#000",
+                                    fontWeight: "500",
+                                    fontSize: "0.95rem",
+                                    textDecoration: "none",
+                                    padding: "2px 0",
+                                }}
+                            >
+                                {menu.name}
+                            </Link>
+                        )}
                     </li>
                 ))}
             </ul>

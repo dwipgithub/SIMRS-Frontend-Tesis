@@ -4,6 +4,8 @@ import Beranda from '../pages/Beranda/Beranda'
 import Kunjungan from "../pages/Kunjungan/Kunjungan";
 import Pemeriksaan from "../pages/Pemeriksaan/Pemeriksaan";
 import HasilLab from "../pages/HasilLab/HasilLab";
+import Dataset from "../pages/Dataset/Dataset"
+import EvaluasiModel from "../pages/EvaluasiModel/EvaluasiModel"
 
 const Content = () => {
     return (
@@ -13,6 +15,8 @@ const Content = () => {
                 <Route path="/kunjungan" element={<Kunjungan />} />
                 <Route path="/pemeriksaan" element={<Pemeriksaan />} />
                 <Route path="/hasil-lab" element={<HasilLab />} />
+                <Route path="/dataset" element={<Dataset/>}/>
+                <Route path="/evaluasi-model" element={<EvaluasiModel/>}/>
             </Routes>
         </div>
     )
