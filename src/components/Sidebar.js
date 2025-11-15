@@ -7,8 +7,8 @@ const Sidebar = () => {
 
     const menus = [
         { name: "Kunjungan", path: "/kunjungan" },
-        { name: "Pemeriksaan", path: "/kunjungan" },
-        { name: "Laboratorium", path: "/hasil-lab" },
+        { name: "Pemeriksaan", path: "/pemeriksaan" },
+        { name: "Laboratorium", path: "/laboratorium" },
         {
             name: "Machine Learning",
             subMenus: [

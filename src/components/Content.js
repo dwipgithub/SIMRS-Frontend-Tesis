@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Beranda from '../pages/Beranda/Beranda'
 import Kunjungan from "../pages/Kunjungan/Kunjungan";
 import Pemeriksaan from "../pages/Pemeriksaan/Pemeriksaan";
-import HasilLab from "../pages/HasilLab/HasilLab";
+import Laboratorium from "../pages/Laboratorium/Laboratorium";
 import Dataset from "../pages/Dataset/Dataset"
 import EvaluasiModel from "../pages/EvaluasiModel/EvaluasiModel"
 
@@ -14,7 +14,7 @@ const Content = () => {
                 <Route path="/beranda" element={<Beranda />} />
                 <Route path="/kunjungan" element={<Kunjungan />} />
                 <Route path="/pemeriksaan" element={<Pemeriksaan />} />
-                <Route path="/hasil-lab" element={<HasilLab />} />
+                <Route path="/laboratorium" element={<Laboratorium />} />
                 <Route path="/dataset" element={<Dataset/>}/>
                 <Route path="/evaluasi-model" element={<EvaluasiModel/>}/>
             </Routes>
