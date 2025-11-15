@@ -18,10 +18,23 @@ axiosJWT.interceptors.request.use(
     }
 )
 
-export const insertPrediksiPenyakitJantung = async (data) => {
+export const insertPrediksiPenyakitJantung = async (Usia, Jenis_Kelamin, Riwayat_Hipertensi, Riwayat_Diabetes, Riwayat_Merokok, Riwayat_Jantung_Keluarga, BMI, Tekanan_Darah_Sistolik, Tekanan_Darah_Diastolik, Kadar_LDL, Kadar_HDL, Kolesterol_Total, Gula_Darah_Puasa, Denyut_Nadi) => {
     try {
         const response = await axiosJWT.post(`/backend/prediksi-penyakit-jantung`, {
-            data,
+            Usia,
+            Jenis_Kelamin,
+            Riwayat_Hipertensi,
+            Riwayat_Diabetes,
+            Riwayat_Merokok,
+            Riwayat_Jantung_Keluarga,
+            BMI,
+            Tekanan_Darah_Sistolik,
+            Tekanan_Darah_Diastolik,
+            Kadar_LDL,
+            Kadar_HDL,
+            Kolesterol_Total,
+            Gula_Darah_Puasa,
+            Denyut_Nadi,
         });
         return response.data;
     } catch (error) {

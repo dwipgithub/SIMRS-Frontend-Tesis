@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { getOrderLab } from "../../api/order-lab";
-import { insertHasilLab } from "../../api/laboratorium";
+import { insertHasilLab, getHasilLab } from "../../api/laboratorium";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
@@ -54,6 +54,17 @@ const styles = {
     },
 };
 
+// Utility functions
+const formatTanggal = (tanggal) => {
+    if (!tanggal) return "-";
+    const date = new Date(tanggal);
+    return date.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+    });
+};
+
 const Laboratorium = () => {
     const navigate = useNavigate();
 
@@ -69,6 +80,7 @@ const Laboratorium = () => {
     // Selected order lab state
     const [selectedOrderLab, setSelectedOrderLab] = useState(null);
     const [hasilLabData, setHasilLabData] = useState([]);
+    const [riwayatHasilLab, setRiwayatHasilLab] = useState([]);
 
     // Load order lab
     const loadOrderLab = async () => {
@@ -91,6 +103,23 @@ const Laboratorium = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Load riwayat hasil lab berdasarkan orderLabId
+    const loadRiwayatHasilLab = useCallback(async (orderLabId) => {
+        if (!orderLabId) {
+            setRiwayatHasilLab([]);
+            return;
+        }
+
+        try {
+            const filters = { orderLabId };
+            const response = await getHasilLab(filters);
+            setRiwayatHasilLab(response.data || []);
+        } catch (err) {
+            // Silent fail untuk riwayat, tidak perlu toast error
+            setRiwayatHasilLab([]);
+        }
+    }, []);
+
     // Select order lab
     const handleSelectOrderLab = (orderLab) => {
         setSelectedOrderLab(orderLab);
@@ -100,6 +129,8 @@ const Laboratorium = () => {
             nilai: "",
         }));
         setHasilLabData(initialData);
+        // Load riwayat hasil lab
+        loadRiwayatHasilLab(orderLab.id);
         setActiveTab("hasilLab");
     };
 
@@ -142,6 +173,8 @@ const Laboratorium = () => {
 
             await insertHasilLab(String(selectedOrderLab.id), data);
             toast.success("Hasil lab berhasil disimpan!");
+            // Reload riwayat hasil lab setelah berhasil simpan
+            loadRiwayatHasilLab(selectedOrderLab.id);
             setSelectedOrderLab(null);
             setHasilLabData([]);
             loadOrderLab(); // Reload data
@@ -300,7 +333,15 @@ const Laboratorium = () => {
                 pemeriksaan.
             </p>
 
-            {selectedOrderLab ? (
+            {!selectedOrderLab && (
+                <div className="alert alert-info">
+                    Silakan pilih order lab dari tab Daftar Order Lab terlebih
+                    dahulu.
+                </div>
+            )}
+
+            {/* Form hanya ditampilkan jika belum ada riwayat */}
+            {selectedOrderLab && riwayatHasilLab.length === 0 && (
                 <form
                     onSubmit={handleSubmitHasilLab}
                     className="rounded"
@@ -489,10 +530,107 @@ const Laboratorium = () => {
                         </button>
                     </div>
                 </form>
-            ) : (
-                <div className="alert alert-info">
-                    Silakan pilih order lab dari tab Daftar Order Lab terlebih
-                    dahulu.
+            )}
+
+            {/* Riwayat Hasil Lab */}
+            {selectedOrderLab && (
+                <div className="mt-4">
+                    <h5 className="mb-3">📋 Riwayat Hasil Lab</h5>
+                    {loading && riwayatHasilLab.length === 0 ? (
+                        <div className="text-center text-muted py-3">
+                            Memuat riwayat hasil lab...
+                        </div>
+                    ) : riwayatHasilLab.length > 0 ? (
+                        riwayatHasilLab.map((hasilLab) => (
+                            <div
+                                key={hasilLab.id}
+                                className="rounded mb-3"
+                                style={styles.formContainer}
+                            >
+                                <div className="p-3">
+                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 className="mb-0">
+                                            Hasil Lab #{hasilLab.id}
+                                        </h6>
+                                        <div>
+                                            <small className="text-muted">
+                                                Tanggal:{" "}
+                                                {formatTanggal(hasilLab.tanggal || hasilLab.createdAt)}
+                                            </small>
+                                            {hasilLab.petugasLab && (
+                                                <small className="text-muted ms-2">
+                                                    | Petugas: {hasilLab.petugasLab.nama}
+                                                </small>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {hasilLab.hasilLabDetail && hasilLab.hasilLabDetail.length > 0 ? (
+                                        <div className="table-responsive">
+                                            <table className="table table-bordered table-hover mb-0">
+                                                <thead className="table-light">
+                                                    <tr>
+                                                        <th>Nama Pemeriksaan</th>
+                                                        <th>Nilai Rujukan</th>
+                                                        <th>Hasil</th>
+                                                        <th>Satuan</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {hasilLab.hasilLabDetail.map((detail) => {
+                                                        const nilai = parseFloat(detail.nilai);
+                                                        const nilaiBawah = parseFloat(
+                                                            detail.pemeriksaanLab?.nilaiRujukanBawah || 0
+                                                        );
+                                                        const nilaiAtas = parseFloat(
+                                                            detail.pemeriksaanLab?.nilaiRujukanAtas || 0
+                                                        );
+                                                        const isNormal = nilai >= nilaiBawah && nilai <= nilaiAtas;
+
+                                                        return (
+                                                            <tr key={detail.id}>
+                                                                <td>
+                                                                    {detail.pemeriksaanLab?.nama || "-"}
+                                                                </td>
+                                                                <td>
+                                                                    {detail.pemeriksaanLab?.nilaiRujukanBawah || "-"} -{" "}
+                                                                    {detail.pemeriksaanLab?.nilaiRujukanAtas || "-"}
+                                                                </td>
+                                                                <td>
+                                                                    <strong>{detail.nilai || "-"}</strong>
+                                                                </td>
+                                                                <td>
+                                                                    {detail.pemeriksaanLab?.satuan || "-"}
+                                                                </td>
+                                                                <td>
+                                                                    <span
+                                                                        className={`badge ${
+                                                                            isNormal ? "bg-success" : "bg-danger"
+                                                                        }`}
+                                                                    >
+                                                                        {isNormal ? "Normal" : "Tidak Normal"}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center text-muted py-2">
+                                            Tidak ada detail hasil lab.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="alert alert-info">
+                            Belum ada riwayat hasil lab untuk order lab ini.
+                        </div>
+                    )}
                 </div>
             )}
         </div>

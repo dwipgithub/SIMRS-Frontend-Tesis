@@ -12,7 +12,7 @@ const Sidebar = () => {
         {
             name: "Machine Learning",
             subMenus: [
-                { name: "Dataset", path: "/dataset" },
+                { name: "Dataset Statistik", path: "/dataset" },
                 { name: "Evaluasi Model", path: "/evaluasi-model" },
             ],
         },
