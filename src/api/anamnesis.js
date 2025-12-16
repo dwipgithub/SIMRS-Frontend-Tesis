@@ -26,7 +26,7 @@ export const insertAnamnesis = async (
     riwayatJantungKeluarga
 ) => {
     try {
-        const response = await axiosJWT.post(`/backend/anamnesis`, {
+        const response = await axiosJWT.post(`/api/v1/anamnesis`, {
             kunjunganId,
             riwayatHipertensi,
             riwayatDiabetes,
@@ -41,7 +41,7 @@ export const insertAnamnesis = async (
 
 export const getAnamnesis = async (filters = {}) => {
     try {
-        const response = await axiosJWT.get(`/backend/anamnesis`, {
+        const response = await axiosJWT.get(`/api/v1/anamnesis`, {
             params: filters,
         });
         return response.data;

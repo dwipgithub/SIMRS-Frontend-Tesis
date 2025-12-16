@@ -20,7 +20,7 @@ axiosJWT.interceptors.request.use(
 
 export const getPoliklinik = async (filters = {}) => {
     try {
-        const response = await axiosJWT.get(`/backend/poliklinik`, {
+        const response = await axiosJWT.get(`/api/v1/poliklinik`, {
             params: filters,
         });
         return response.data;
@@ -32,7 +32,7 @@ export const getPoliklinik = async (filters = {}) => {
 
 export const showPoliklinik = async (id) => {
     try {
-        const response = await axiosJWT.get(`/backend/poliklinik/${id}`);
+        const response = await axiosJWT.get(`/api/v1/poliklinik/${id}`);
         return response.data;
     } catch (error) {
         console.error("Gagal mengambil data poliklinik:", error);

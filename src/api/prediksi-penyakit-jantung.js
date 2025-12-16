@@ -8,7 +8,7 @@ const axiosJWT = axios.create({
 
 axiosJWT.interceptors.request.use(
     async (config) => {
-        const response = await tokenUser(); // ✅ tunggu token dulu
+        const response = await tokenUser();
         const token = response.data.data.access_token;
         config.headers.Authorization = `Bearer ${token}`;
         return config;
@@ -20,7 +20,7 @@ axiosJWT.interceptors.request.use(
 
 export const insertPrediksiPenyakitJantung = async (Usia, Jenis_Kelamin, Riwayat_Hipertensi, Riwayat_Diabetes, Riwayat_Merokok, Riwayat_Jantung_Keluarga, BMI, Tekanan_Darah_Sistolik, Tekanan_Darah_Diastolik, Kadar_LDL, Kadar_HDL, Kolesterol_Total, Gula_Darah_Puasa, Denyut_Nadi) => {
     try {
-        const response = await axiosJWT.post(`/backend/prediksi-penyakit-jantung`, {
+        const response = await axiosJWT.post(`/api/v1/model-klasifikasi/penyakit-jantung/knn/prediksi`, {
             Usia,
             Jenis_Kelamin,
             Riwayat_Hipertensi,

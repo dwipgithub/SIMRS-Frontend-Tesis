@@ -6,6 +6,8 @@ import Pemeriksaan from "../pages/Pemeriksaan/Pemeriksaan";
 import Laboratorium from "../pages/Laboratorium/Laboratorium";
 import Dataset from "../pages/Dataset/Dataset"
 import EvaluasiModel from "../pages/EvaluasiModel/EvaluasiModel"
+import PelatihanModel from "../pages/PelatihanModel/PelatihanModel"
+import PeringkatFitur from "../pages/PeringkatFitur/PeringkatFitur";
 
 const Content = () => {
     return (
@@ -15,8 +17,10 @@ const Content = () => {
                 <Route path="/kunjungan" element={<Kunjungan />} />
                 <Route path="/pemeriksaan" element={<Pemeriksaan />} />
                 <Route path="/laboratorium" element={<Laboratorium />} />
-                <Route path="/dataset" element={<Dataset/>}/>
-                <Route path="/evaluasi-model" element={<EvaluasiModel/>}/>
+                <Route path="/dataset/statistik" element={<Dataset/>}/>
+                <Route path="/model-klasifikasi/evaluasi-model" element={<EvaluasiModel/>}/>
+                <Route path="/model-klasifikasi/pelatihan-model" element={<PelatihanModel/>}/>
+                <Route path="/model-klasifikasi/peringkat-fitur" element={<PeringkatFitur/>}/>
             </Routes>
         </div>
     )

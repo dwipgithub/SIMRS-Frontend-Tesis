@@ -20,7 +20,7 @@ axiosJWT.interceptors.request.use(
 
 export const getPemeriksaanLab = async (filters = {}) => {
     try {
-        const response = await axiosJWT.get(`/backend/pemeriksaan-lab`, {
+        const response = await axiosJWT.get(`/api/v1/pemeriksaan-lab`, {
             params: filters,
         });
         return response.data;
@@ -32,7 +32,7 @@ export const getPemeriksaanLab = async (filters = {}) => {
 
 export const showPemeriksaanLab = async (id) => {
     try {
-        const response = await axiosJWT.get(`/backend/pemeriksaan-lab/${id}`);
+        const response = await axiosJWT.get(`/api/v1/pemeriksaan-lab/${id}`);
         return response.data;
     } catch (error) {
         console.error("Gagal mengambil data pemeriksaan lab:", error);

@@ -20,7 +20,7 @@ axiosJWT.interceptors.request.use(
 
 export const insertOrderLab = async (kunjunganId, data) => {
     try {
-        const response = await axiosJWT.post(`/backend/order-lab`, {
+        const response = await axiosJWT.post(`/api/v1/order-lab`, {
             kunjunganId,
             data,
         });
@@ -32,7 +32,7 @@ export const insertOrderLab = async (kunjunganId, data) => {
 
 export const getOrderLab = async (filters = {}) => {
     try {
-        const response = await axiosJWT.get(`/backend/order-lab`, {
+        const response = await axiosJWT.get(`/api/v1/order-lab`, {
             params: filters,
         });
         return response.data;

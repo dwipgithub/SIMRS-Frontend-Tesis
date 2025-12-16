@@ -20,7 +20,7 @@ axiosJWT.interceptors.request.use(
 
 export const insertKunjungan = async (pasienId, poliklinikId, dokterId) => {
     try {
-        const response = await axiosJWT.post(`/backend/kunjungan`, {
+        const response = await axiosJWT.post(`/api/v1/kunjungan`, {
             pasienId,
             poliklinikId,
             dokterId
@@ -34,7 +34,7 @@ export const insertKunjungan = async (pasienId, poliklinikId, dokterId) => {
 
 export const getKunjungan = async (filters = {}) => {
     try {
-        const response = await axiosJWT.get(`/backend/kunjungan`, {
+        const response = await axiosJWT.get(`/api/v1/kunjungan`, {
             params: filters,
         });
         return response.data;

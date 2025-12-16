@@ -11,6 +11,8 @@ import {
     Tooltip,
     Legend,
     ResponsiveContainer,
+    Cell,
+    LabelList,
     RadarChart,
     PolarGrid,
     PolarAngleAxis,
@@ -65,6 +67,8 @@ const EvaluasiModel = () => {
             })
             : [];
 
+    // (Removed vertical label renderer) show model names under bars instead
+
     return (
         <div
             className="container"
@@ -110,7 +114,6 @@ const EvaluasiModel = () => {
                                 }}
                             >
                                 <tr>
-                                    <th>No</th>
                                     <th>Model</th>
                                     <th>Accuracy</th>
                                     <th>Precision</th>
@@ -121,10 +124,9 @@ const EvaluasiModel = () => {
                             <tbody>
                                 {datasetList.map((item, index) => (
                                     <tr key={index}>
-                                        <td>{index + 1}</td>
-                                        <td>{item.Model || "-"}</td>
+                                        <td className="text-start">{item.Model || "-"}</td>
 
-                                        <td
+                                        <td 
                                             style={
                                                 Number(item.Accuracy) === maxValues["Accuracy"]
                                                     ? { color: "#ff6600", fontWeight: "bold" }
@@ -169,27 +171,84 @@ const EvaluasiModel = () => {
                         </table>
                     </div>
 
-                    {/* === BAR CHART === */}
+                    {/* === BAR CHARTS: 4 charts in 2x2 grid with per-bar colors and labels === */}
                     <div className="mb-5">
-                        <h5 className="text-center mb-3">
-                            📊 Perbandingan Performa Model (Bar Chart)
-                        </h5>
-                        <ResponsiveContainer width="100%" height={400}>
-                            <BarChart
-                                data={datasetList}
-                                margin={{ top: 20, right: 30, left: 10, bottom: 5 }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="Model" tick={{ fontSize: 12 }} interval={0} />
-                                <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="Accuracy" fill="#007bff" />
-                                <Bar dataKey="Precision" fill="#ff6600" />
-                                <Bar dataKey="Recall" fill="#28a745" />
-                                <Bar dataKey="F1-Score" fill="#6f42c1" />
-                            </BarChart>
-                        </ResponsiveContainer>
+                        <h5 className="text-center mb-3">📊 Perbandingan Performa Model (Per Metrik)</h5>
+
+                        {/* Inline styles: stack charts vertically (one chart per row) */}
+                        <style>{`
+                            .charts-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+                        `}</style>
+
+                        {/* Helper to build colored data per metric */}
+                        {(() => {
+                            const groupColors = {
+                                knn: ["#2f80ed", "#1976d2", "#1155b3"],
+                                nb: ["#ffb74d", "#ff9800", "#fb8c00"],
+                                lr: ["#66bb6a", "#43a047", "#2e7d32"],
+                            };
+
+                            const counters = { knn: 0, nb: 0, lr: 0 };
+
+                            const makeData = (metric) => {
+                                return datasetList.map((it) => {
+                                    const name = it.Model || "-";
+                                    const lower = name.toLowerCase();
+                                    let group = "lr";
+                                    if (lower.includes("knn")) group = "knn";
+                                    else if (lower.includes("nb") || lower.includes("naive")) group = "nb";
+
+                                    const idx = counters[group] % groupColors[group].length;
+                                    const fill = groupColors[group][idx];
+                                    counters[group] += 1;
+
+                                    return {
+                                        name,
+                                        value: Number(it[metric]) || 0,
+                                        raw: it[metric] ?? "-",
+                                        fill,
+                                    };
+                                });
+                            };
+
+                            const charts = [
+                                { key: "Accuracy", color: "#007bff" },
+                                { key: "Precision", color: "#ff6600" },
+                                { key: "Recall", color: "#28a745" },
+                                { key: "F1-Score", color: "#6f42c1" },
+                            ];
+
+                            return (
+                                <div className="charts-grid">
+                                    {charts.map((ch) => {
+                                        // reset counters for each chart so color assignment consistent across charts
+                                        counters.knn = 0; counters.nb = 0; counters.lr = 0;
+                                        const data = makeData(ch.key);
+
+                                        return (
+                                            <div key={ch.key}>
+                                                <h6 className="text-center mb-2">{ch.key}</h6>
+                                                <ResponsiveContainer width="100%" height={300}>
+                                                    <BarChart data={data} margin={{ top: 12, right: 12, left: 8, bottom: 60 }}>
+                                                        <CartesianGrid strokeDasharray="3 3" />
+                                                        <XAxis dataKey="name" tick={false} interval={0} />
+                                                        <YAxis />
+                                                        <Tooltip />
+                                                        <Bar dataKey="value">
+                                                            {data.map((entry, index) => (
+                                                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                                                            ))}
+                                                            <LabelList dataKey="raw" position="top" formatter={(val) => (val === undefined || val === null ? "-" : String(val))} />
+                                                            <LabelList dataKey="name" position="bottom" formatter={(val) => (val === undefined || val === null ? "-" : String(val))} />
+                                                        </Bar>
+                                                    </BarChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            );
+                        })()}
                     </div>
 
                     {/* === RADAR (SPIDER) CHART === */}

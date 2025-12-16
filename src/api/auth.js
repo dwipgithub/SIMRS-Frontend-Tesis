@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const loginUser = async (email, password) => {
     try {
-        const response = await axios.post(`/backend/login`, {
+        const response = await axios.post(`/api/v1/login`, {
             email,
             password,
         });
@@ -15,7 +15,7 @@ export const loginUser = async (email, password) => {
 
 export const logoutUser = async() => {
     try {
-        await axios.delete(`/backend/logout`, {})
+        await axios.delete(`/api/v1/logout`, {})
     } catch (error) {
         console.error("Logout error:", error);
         throw error.response?.data || { message: "Terjadi kesalahan koneksi" };
@@ -24,7 +24,7 @@ export const logoutUser = async() => {
 
 export const tokenUser = async() => {
     try {
-        const response = await axios.get(`/backend/token`, {})
+        const response = await axios.get(`/api/v1/token`, {})
         return response
     } catch (error) {
         console.error("Login error:", error);

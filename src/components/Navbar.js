@@ -1,14 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Dropdown } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
-import { logoutUser } from '../api/auth';
+import { logoutUser, tokenUser } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
+import { jwtDecode } from "jwt-decode";
 
 const Navbar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(true); // ubah sesuai status login
-    const navigate = useNavigate()
+    const [pegawaiNama, setPegawaiNama] = useState("Nama Pengguna");
+    const navigate = useNavigate();
+
+    // Fetch user info from token on component mount
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const response = await tokenUser();
+                if (response.data && response.data.data && response.data.data.access_token) {
+                    const token = response.data.data.access_token;
+                    const decoded = jwtDecode(token);
+                    if (decoded.pegawaiNama) {
+                        setPegawaiNama(decoded.pegawaiNama);
+                    }
+                } else {
+                    setPegawaiNama("Nama Pengguna");
+                }
+            } catch (err) {
+                console.error("Error fetching user info:", err);
+                setPegawaiNama("Nama Pengguna");
+            }
+        };
+
+        fetchUserInfo();
+    }, []);
 
     const handleLogout = async () => {
         try {
@@ -65,7 +90,7 @@ const Navbar = () => {
                                 <FaUserCircle
                                     style={{ fontSize: "1.6rem", marginRight: "8px", color: "black" }}
                                 />
-                                <span>Nama Pengguna</span>
+                                <span>{pegawaiNama}</span>
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu>

@@ -20,7 +20,7 @@ axiosJWT.interceptors.request.use(
 
 export const insertHasilLab = async (orderLabId, data) => {
     try {
-        const response = await axiosJWT.post(`/backend/hasil-lab`, {
+        const response = await axiosJWT.post(`/api/v1/hasil-lab`, {
             orderLabId,
             data,
         });
@@ -32,7 +32,7 @@ export const insertHasilLab = async (orderLabId, data) => {
 
 export const getHasilLab = async (filters = {}) => {
     try {
-        const response = await axiosJWT.get(`/backend/hasil-lab`, {
+        const response = await axiosJWT.get(`/api/v1/hasil-lab`, {
             params: filters,
         });
         return response.data;

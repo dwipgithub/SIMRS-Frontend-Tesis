@@ -8,7 +8,7 @@ const axiosJWT = axios.create({
 
 axiosJWT.interceptors.request.use(
     async (config) => {
-        const response = await tokenUser(); // ✅ tunggu token dulu
+        const response = await tokenUser(); 
         const token = response.data.data.access_token;
         config.headers.Authorization = `Bearer ${token}`;
         return config;
@@ -18,9 +18,9 @@ axiosJWT.interceptors.request.use(
     }
 )
 
-export const getEvaluasiModel = async () => {
+export const getPeringkatFitur = async () => {
     try {
-        const response = await axiosJWT.get('/api/v1/model-klasifikasi/penyakit-jantung/evaluasi', {});
+        const response = await axiosJWT.get(`/api/v1/model-klasifikasi/penyakit-jantung/peringkat-fitur`, {});
         return response.data;
     } catch (error) {
         console.error("Gagal mengambil data modeling:", error);

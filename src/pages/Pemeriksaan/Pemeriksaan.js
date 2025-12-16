@@ -58,6 +58,41 @@ const styles = {
     searchInputGroup: {
         width: "300px",
     },
+    toggleSwitch: {
+        position: "relative",
+        display: "inline-block",
+        width: "48px",
+        height: "24px",
+        cursor: "pointer",
+        verticalAlign: "middle",
+        marginRight: "10px"
+    },
+    toggleSlider: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "#ccc",
+        borderRadius: "24px",
+        transition: "0.3s",
+    },
+    toggleSliderOn: {
+        backgroundColor: "#4caf50",
+    },
+    toggleCircle: {
+        position: "absolute",
+        width: "20px",
+        height: "20px",
+        backgroundColor: "white",
+        borderRadius: "50%",
+        top: "2px",
+        left: "2px",
+        transition: "0.3s"
+    },
+    toggleCircleOn: {
+        transform: "translateX(24px)",
+    }
 };
 
 // Utility functions
@@ -164,8 +199,8 @@ const PemeriksaanAwal = () => {
     const [riwayatOrderLab, setRiwayatOrderLab] = useState([]);
 
     // Prediksi Penyakit state
-    const [,setDataPemeriksaanAwal] = useState(null);
-    const [,setDataAnamnesis] = useState(null);
+    const [dataPemeriksaanAwalPrediksi, setDataPemeriksaanAwal] = useState(null);
+    const [dataAnamnesisPrediksi, setDataAnamnesis] = useState(null);
     const [prediksiResult, setPrediksiResult] = useState(null);
 
     // Get today's date
@@ -202,10 +237,23 @@ const PemeriksaanAwal = () => {
         }
     }, []);
 
+
+    // State untuk menyimpan apakah bagian perhitungan manual ditampilkan atau disembunyikan.
+    // Nilai awal bernilai false, artinya bagian detail perhitungan manual tidak ditampilkan ketika pertama kali ditampilkan.
+    const [showManualCalc, setShowManualCalc] = useState(false);
+
+    // State untuk toggle informasi pendukung di tab prediksi penyakit
+    const [showDataPasien, setShowDataPasien] = useState(false);
+    const [showPemeriksaanAwal, setShowPemeriksaanAwal] = useState(false);
+    const [showAnamnesis, setShowAnamnesis] = useState(false);
+    const [showHasilLab, setShowHasilLab] = useState(false);
+
+
     // Load data on mount
     useEffect(() => {
         loadKunjunganHariIni();
         loadPemeriksaanLab();
+        setShowManualCalc(false);
     }, [loadKunjunganHariIni, loadPemeriksaanLab]);
 
     // Auto focus ke input tekanan darah sistolik ketika tab pemeriksaan awal aktif
@@ -216,6 +264,14 @@ const PemeriksaanAwal = () => {
             }, 100);
         }
     }, [activeTab, formPemeriksaanAwal.kunjunganId]);
+
+    // Load hasil lab saat tab prediksi penyakit dibuka jika belum ada data
+    useEffect(() => {
+        if (activeTab === "prediksiPenyakit" && formData.kunjunganId && hasilLabList.length === 0) {
+            loadHasilLab(formData.kunjunganId);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeTab, formData.kunjunganId]);
 
     // Auto prediksi ketika tab prediksi penyakit aktif dan ada kunjunganId
     useEffect(() => {
@@ -1709,57 +1765,328 @@ const PemeriksaanAwal = () => {
     );
 
     // Render prediksi penyakit
-    const renderPrediksiPenyakit = () => (
-        <div>
-            <h4 className="mb-3">🔮 Prediksi Penyakit Jantung</h4>
-            <p className="text-muted">
-                Pilih pasien dari tab Data Pasien, pastikan data pemeriksaan awal, anamnesis, dan hasil lab sudah tersedia. Prediksi akan dilakukan secara otomatis.
-            </p>
+    const renderPrediksiPenyakit = () => {
+        // Helper function untuk render toggle
+        const renderToggle = (label, isOn, onToggle) => (
+            <div
+                onClick={onToggle}
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    marginBottom: "4px",
+                }}
+            >
+                <div style={styles.toggleSwitch}>
+                    <div
+                        style={{
+                            ...styles.toggleSlider,
+                            ...(isOn ? styles.toggleSliderOn : {}),
+                        }}
+                    />
+                    <div
+                        style={{
+                            ...styles.toggleCircle,
+                            ...(isOn ? styles.toggleCircleOn : {}),
+                        }}
+                    />
+                </div>
+                <span className="fw-bold small">
+                    {isOn ? "ON" : "OFF"} - {label}
+                </span>
+            </div>
+        );
 
-            {formData.kunjunganId ? (
-                <div>
-                    {loading && !prediksiResult && (
-                        <div className="text-center text-muted py-3">
-                            <div className="spinner-border spinner-border-sm me-2" role="status">
-                                <span className="visually-hidden">Loading...</span>
+        // Get data pasien dari kunjungan
+        const kunjungan = kunjunganHariIni.find(k => k.id === formData.kunjunganId);
+        const pasien = kunjungan?.pasien || null;
+
+        // Get data pemeriksaan awal terbaru (prioritaskan data yang digunakan untuk prediksi)
+        const pemeriksaanAwalData = dataPemeriksaanAwalPrediksi || 
+            (riwayatPemeriksaanAwal.length > 0 ? riwayatPemeriksaanAwal[0] : null);
+
+        // Get data anamnesis terbaru (prioritaskan data yang digunakan untuk prediksi)
+        const anamnesisData = dataAnamnesisPrediksi || 
+            (riwayatAnamnesis.length > 0 ? riwayatAnamnesis[0] : null);
+
+        return (
+            <div>
+                <h4 className="mb-3">🔮 Prediksi Penyakit Jantung</h4>
+                <p className="text-muted">
+                    Pilih pasien dari tab Data Pasien, pastikan data pemeriksaan awal,
+                    anamnesis, dan hasil lab sudah tersedia. Prediksi akan dilakukan secara otomatis.
+                </p>
+        
+                {formData.kunjunganId ? (
+                    <div>
+                        {/* Loading */}
+                        {loading && !prediksiResult && (
+                            <div className="text-center text-muted py-3">
+                                <div
+                                    className="spinner-border spinner-border-sm me-2"
+                                    role="status"
+                                >
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                                Memproses prediksi...
                             </div>
-                            Memproses prediksi...
-                        </div>
-                    )}
+                        )}
 
-                    {prediksiResult && (
-                        <div className="rounded p-3 mt-3" style={styles.formContainer}>
-                            <h5 className="mb-3">Hasil Prediksi</h5>
-                            <div className={`alert ${prediksiResult.prediction === 1 || prediksiResult.prediction === "1" 
-                                ? "alert-danger" 
-                                : "alert-success"
-                            }`}>
-                                <strong>Status Prediksi:</strong>{" "}
-                                {prediksiResult.label || (
-                                    prediksiResult.prediction === 1 || prediksiResult.prediction === "1" 
-                                        ? "Berisiko Penyakit Jantung"
-                                        : "Tidak Berisiko Penyakit Jantung"
+                        {/* ================================
+                            TOGGLE INFORMASI PENDUKUNG (DI ATAS)
+                           ================================ */}
+                        <div className="rounded p-2 mb-3" style={styles.formContainer}>
+                            <h6 className="mb-2">📋 Informasi Pendukung</h6>
+                            <div className="d-flex flex-wrap gap-2">
+                                {renderToggle("Data Pasien", showDataPasien, () => setShowDataPasien(!showDataPasien))}
+                                {renderToggle("Pemeriksaan Awal", showPemeriksaanAwal, () => setShowPemeriksaanAwal(!showPemeriksaanAwal))}
+                                {renderToggle("Anamnesis", showAnamnesis, () => setShowAnamnesis(!showAnamnesis))}
+                                {renderToggle("Hasil Lab", showHasilLab, () => setShowHasilLab(!showHasilLab))}
+                            </div>
+                        </div>
+
+                        {/* ================================
+                            INFORMASI PENDUKUNG - RINGKAS
+                           ================================ */}
+                        {(showDataPasien || showPemeriksaanAwal || showAnamnesis || showHasilLab) && (
+                            <div className="row g-2 mb-3">
+                                {/* DATA PASIEN - NARASI */}
+                                {showDataPasien && pasien && (
+                                    <div className="col-md-6 d-flex">
+                                        <div className="rounded p-2 border w-100 d-flex flex-column" style={{ backgroundColor: "#f8f9fa" }}>
+                                            <h6 className="mb-1 small">👤 Data Pasien</h6>
+                                            <p className="mb-0 small" style={{ lineHeight: "1.4" }}>
+                                                <strong>NIK:</strong> {pasien.nik || formData.NIK || "-"} | 
+                                                <strong> Nama:</strong> {pasien.nama || formData.nama || "-"} | 
+                                                <strong> JK:</strong> {pasien.jenisKelamin || formData.jenisKelamin || "-"} | 
+                                                <strong> Tgl Lahir:</strong> {pasien.tanggal_lahir || pasien.tanggalLahir || formData.tanggalLahir
+                                                    ? formatTanggal(pasien.tanggal_lahir || pasien.tanggalLahir || formData.tanggalLahir)
+                                                    : "-"} | 
+                                                <strong> Poliklinik:</strong> {kunjungan?.poliklinik?.nama || formData.poliklinik || "-"} | 
+                                                <strong> Dokter:</strong> {kunjungan?.dokter?.nama || formData.dokter || "-"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* PEMERIKSAAN AWAL - NARASI */}
+                                {showPemeriksaanAwal && pemeriksaanAwalData && (
+                                    <div className="col-md-6 d-flex">
+                                        <div className="rounded p-2 border w-100 d-flex flex-column" style={{ backgroundColor: "#f8f9fa" }}>
+                                            <h6 className="mb-1 small">🩺 Pemeriksaan Awal</h6>
+                                            <p className="mb-0 small" style={{ lineHeight: "1.4" }}>
+                                                <strong>Tekanan Darah:</strong> {pemeriksaanAwalData.tekananDarahSistolik || "-"} /{" "}
+                                                {pemeriksaanAwalData.tekananDarahDiastolik || "-"} mmHg | 
+                                                <strong> Denyut Nadi:</strong> {pemeriksaanAwalData.denyutNadi ? `${pemeriksaanAwalData.denyutNadi} bpm` : "-"} | 
+                                                <strong> Suhu:</strong> {pemeriksaanAwalData.suhuTubuh ? `${pemeriksaanAwalData.suhuTubuh} °C` : "-"} | 
+                                                <strong> Tinggi:</strong> {pemeriksaanAwalData.tinggiBadan ? `${pemeriksaanAwalData.tinggiBadan} cm` : "-"} | 
+                                                <strong> Berat:</strong> {pemeriksaanAwalData.beratBadan ? `${pemeriksaanAwalData.beratBadan} kg` : "-"} | 
+                                                <strong> BMI:</strong> {calculateBMI(pemeriksaanAwalData.tinggiBadan, pemeriksaanAwalData.beratBadan)
+                                                    ? calculateBMI(pemeriksaanAwalData.tinggiBadan, pemeriksaanAwalData.beratBadan).toFixed(1)
+                                                    : "-"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* ANAMNESIS - NARASI */}
+                                {showAnamnesis && anamnesisData && (
+                                    <div className="col-md-6 d-flex">
+                                        <div className="rounded p-2 border w-100 d-flex flex-column" style={{ backgroundColor: "#f8f9fa" }}>
+                                            <h6 className="mb-1 small">📝 Anamnesis</h6>
+                                            <p className="mb-0 small" style={{ lineHeight: "1.4" }}>
+                                                <strong>Hipertensi:</strong> {anamnesisData.riwayatHipertensi === 1 ? "Ya" : anamnesisData.riwayatHipertensi === 0 ? "Tidak" : "-"} | 
+                                                <strong> Diabetes:</strong> {anamnesisData.riwayatDiabetes === 1 ? "Ya" : anamnesisData.riwayatDiabetes === 0 ? "Tidak" : "-"} | 
+                                                <strong> Merokok:</strong> {anamnesisData.riwayatMerokok === 1 ? "Ya" : anamnesisData.riwayatMerokok === 0 ? "Tidak" : "-"} | 
+                                                <strong> Jantung Keluarga:</strong> {anamnesisData.riwayatJantungKeluarga === 1 ? "Ya" : anamnesisData.riwayatJantungKeluarga === 0 ? "Tidak" : "-"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* HASIL LAB - NARASI */}
+                                {showHasilLab && hasilLabList.length > 0 && (
+                                    <div className="col-md-6 d-flex">
+                                        <div className="rounded p-2 border w-100 d-flex flex-column" style={{ backgroundColor: "#f8f9fa" }}>
+                                            <h6 className="mb-1 small">🔬 Hasil Lab</h6>
+                                            <div className="small" style={{ lineHeight: "1.5", maxHeight: "120px", overflowY: "auto" }}>
+                                                {hasilLabList.map((hasilLab, idx) => (
+                                                    <div key={hasilLab.id} className={idx > 0 ? "mt-1" : ""}>
+                                                        {hasilLab.hasilLabDetail && hasilLab.hasilLabDetail.length > 0 ? (
+                                                            hasilLab.hasilLabDetail.map((detail, detailIdx) => {
+                                                                const nilai = parseFloat(detail.nilai);
+                                                                const nilaiBawah = parseFloat(
+                                                                    detail.pemeriksaanLab?.nilaiRujukanBawah || 0
+                                                                );
+                                                                const nilaiAtas = parseFloat(
+                                                                    detail.pemeriksaanLab?.nilaiRujukanAtas || 0
+                                                                );
+                                                                const isNormal = nilai >= nilaiBawah && nilai <= nilaiAtas;
+
+                                                                return (
+                                                                    <span key={detail.id}>
+                                                                        <strong>{detail.pemeriksaanLab?.nama || "-"}:</strong> {detail.nilai || "-"}{detail.pemeriksaanLab?.satuan ? ` ${detail.pemeriksaanLab.satuan}` : ""} 
+                                                                        <span className={`badge ms-1 ${isNormal ? "bg-success" : "bg-danger"}`} style={{ fontSize: "0.65rem" }}>
+                                                                            {isNormal ? "N" : "TN"}
+                                                                        </span>
+                                                                        {detailIdx < hasilLab.hasilLabDetail.length - 1 ? " | " : ""}
+                                                                    </span>
+                                                                );
+                                                            })
+                                                        ) : (
+                                                            <span className="text-muted">Tidak ada detail hasil lab.</span>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Pesan jika tidak ada data */}
+                                {showPemeriksaanAwal && !pemeriksaanAwalData && (
+                                    <div className="col-12">
+                                        <div className="alert alert-info py-2 mb-0 small">
+                                            Data pemeriksaan awal belum tersedia.
+                                        </div>
+                                    </div>
+                                )}
+                                {showAnamnesis && !anamnesisData && (
+                                    <div className="col-12">
+                                        <div className="alert alert-info py-2 mb-0 small">
+                                            Data anamnesis belum tersedia.
+                                        </div>
+                                    </div>
+                                )}
+                                {showHasilLab && hasilLabList.length === 0 && (
+                                    <div className="col-12">
+                                        <div className="alert alert-info py-2 mb-0 small">
+                                            Data hasil lab belum tersedia.
+                                        </div>
+                                    </div>
                                 )}
                             </div>
-                            {prediksiResult.probability !== undefined && prediksiResult.probability !== null && (
-                                <div className="mt-3">
-                                    <strong>Probabilitas:</strong>{" "}
-                                    <span className="fs-5 fw-bold">
-                                        {(parseFloat(prediksiResult.probability) * 100).toFixed(2)}%
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            ) : (
-                <div className="alert alert-info">
-                    Silakan pilih pasien dari tab Data Pasien terlebih dahulu.
-                </div>
-            )}
-        </div>
-    );
-
+                        )}
+        
+                        {/* ================================
+                            HASIL PREDIKSI (DI BAWAH)
+                           ================================ */}
+                        {prediksiResult && (
+                            <div className="rounded p-3 mt-3" style={styles.formContainer}>
+                                <h6 className="mb-2 small">Hasil Prediksi</h6>
+        
+                                {/* ===========================
+                                    TABEL STATUS & PROBABILITAS
+                                   =========================== */}
+                                <table className="table table-sm table-bordered bg-white mb-0 small">
+                                    <tbody>
+                                        <tr>
+                                            <th className="w-25" style={{ padding: "2px" }}>Status Prediksi</th>
+                                            <td style={{ padding: "2px" }}>
+                                                <span
+                                                    className={`fw-bold ${
+                                                        Number(prediksiResult.prediction) === 1
+                                                            ? "text-danger"
+                                                            : "text-success"
+                                                    }`}
+                                                >
+                                                    {prediksiResult.label}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th style={{ padding: "2px" }}>Probabilitas</th>
+                                            <td style={{ padding: "2px" }}>
+                                                {(parseFloat(prediksiResult.probability) * 100).toFixed(2)}%
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+        
+                                {/* ================================
+                                    SWITCH TOGGLE DETAIL MANUAL
+                                   ================================ */}
+                                {prediksiResult.probabilityCalculation && (
+                                    <div
+                                        onClick={() => setShowManualCalc(!showManualCalc)}
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            cursor: "pointer",
+                                            marginTop: "12px",
+                                        }}
+                                    >
+                                        <div style={styles.toggleSwitch}>
+                                            <div
+                                                style={{
+                                                    ...styles.toggleSlider,
+                                                    ...(showManualCalc ? styles.toggleSliderOn : {}),
+                                                }}
+                                            />
+                                            <div
+                                                style={{
+                                                    ...styles.toggleCircle,
+                                                    ...(showManualCalc ? styles.toggleCircleOn : {}),
+                                                }}
+                                            />
+                                        </div>
+                                        <span className="fw-bold small">
+                                            {showManualCalc
+                                                ? "ON - Detail Probabilitas"
+                                                : "OFF - Detail Probabilitas"}
+                                        </span>
+                                    </div>
+                                )}
+        
+                                {/* ================================
+                                    TABEL DETAIL PERHITUNGAN MANUAL
+                                   ================================ */}
+                                {showManualCalc && prediksiResult.probabilityCalculation && (
+                                    <div className="mt-4 p-3 border rounded bg-light">
+                                        <h6 className="fw-bold mb-2 small">Detail Perhitungan (KNN)</h6>
+        
+                                        <table className="table table-sm table-bordered mb-0 small">
+                                            <tbody>
+                                                <tr>
+                                                    <td style={{ padding: "2px" }}><strong>k</strong></td>
+                                                    <td style={{ padding: "2px" }}>{prediksiResult.probabilityCalculation.k}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style={{ padding: "2px" }}><strong>Neighbor Labels</strong></td>
+                                                    <td style={{ padding: "2px" }}>
+                                                        {prediksiResult.probabilityCalculation.neighborLabels.join(", ")}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style={{ padding: "2px" }}><strong>Class 0</strong></td>
+                                                    <td style={{ padding: "2px" }}>{prediksiResult.probabilityCalculation.countClass0}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style={{ padding: "2px" }}><strong>Class 1</strong></td>
+                                                    <td style={{ padding: "2px" }}>{prediksiResult.probabilityCalculation.countClass1}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style={{ padding: "2px" }}><strong>Probabilitas</strong></td>
+                                                    <td style={{ padding: "2px" }}>
+                                                        {(prediksiResult.probabilityCalculation.manualProbability * 100).toFixed(2)}%
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="alert alert-info">
+                        Silakan pilih pasien dari tab Data Pasien terlebih dahulu.
+                    </div>
+                )}
+            </div>
+        );
+    };
+    
     // Render hasil lab
     const renderHasilLab = () => (
         <div>

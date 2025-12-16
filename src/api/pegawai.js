@@ -20,7 +20,7 @@ axiosJWT.interceptors.request.use(
 
 export const getPegawai = async (filters = {}) => {
     try {
-        const response = await axiosJWT.get(`/backend/pegawai`, {
+        const response = await axiosJWT.get(`/api/v1/pegawai`, {
             params: filters,
         });
         return response.data;
@@ -32,7 +32,7 @@ export const getPegawai = async (filters = {}) => {
 
 export const showPegawai = async (id) => {
     try {
-        const response = await axiosJWT.get(`/backend/pegawai/${id}`);
+        const response = await axiosJWT.get(`/api/v1/pegawai/${id}`);
         return response.data;
     } catch (error) {
         console.error("Gagal mengambil data pegawai:", error);

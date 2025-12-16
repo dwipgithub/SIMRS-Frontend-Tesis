@@ -10,10 +10,12 @@ const Sidebar = () => {
         { name: "Pemeriksaan", path: "/pemeriksaan" },
         { name: "Laboratorium", path: "/laboratorium" },
         {
-            name: "Machine Learning",
+            name: "Model Klasfikasi",
             subMenus: [
-                { name: "Dataset Statistik", path: "/dataset" },
-                { name: "Evaluasi Model", path: "/evaluasi-model" },
+                { name: "Dataset Statistik", path: "/dataset/statistik" },
+                { name: "Peringkat Fitur", path: "/model-klasifikasi/peringkat-fitur" },
+                { name: "Pelatihan Model", path: "/model-klasifikasi/pelatihan-model" },
+                { name: "Evaluasi Model", path: "/model-klasifikasi/evaluasi-model" },
             ],
         },
     ];

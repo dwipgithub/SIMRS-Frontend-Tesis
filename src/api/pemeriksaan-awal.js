@@ -28,7 +28,7 @@ export const insertPemeriksaanAwal = async (
     beratBadan
 ) => {
     try {
-        const response = await axiosJWT.post(`/backend/pemeriksaan-awal`, {
+        const response = await axiosJWT.post(`/api/v1/pemeriksaan-awal`, {
             kunjunganId,
             tekananDarahSistolik,
             tekananDarahDiastolik,
@@ -45,7 +45,7 @@ export const insertPemeriksaanAwal = async (
 
 export const getPemeriksaanAwal = async (filters = {}) => {
     try {
-        const response = await axiosJWT.get(`/backend/pemeriksaan-awal`, {
+        const response = await axiosJWT.get(`/api/v1/pemeriksaan-awal`, {
             params: filters,
         });
         return response.data;
