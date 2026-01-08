@@ -58,7 +58,7 @@ const Dataset = () => {
             {/* Header */}
             <div className="d-flex align-items-center mb-3" style={{ gap: "8px" }}>
 
-                <h3 className="mb-0">📋 Dataset Statistik</h3>
+                <h3 className="mb-0">📋 Statistik</h3>
             </div>
 
             {/* Kondisi Loading */}
@@ -118,40 +118,6 @@ const Dataset = () => {
                             </tbody>
                         </table>
                     </div>
-                    {/* <div className="mt-5">
-                        <table className="table table-striped table-bordered align-middle text-center mb-0">
-                            <thead
-                                className="table-light"
-                                style={{
-                                    position: "sticky",
-                                    top: 0,
-                                    zIndex: 2,
-                                    backgroundColor: "#f8f9fa",
-                                    boxShadow: "0 2px 2px rgba(0, 0, 0, 0.05)",
-                                }}
-                            >
-                                <tr>
-                                    <th>No</th>
-                                    {Object.keys(datasetList[0]).map((key, index) => (
-                                        <th key={index}>{key.replaceAll("_", " ")}</th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {datasetList.map((item, index) => (
-                                    <tr key={index}>
-                                        <td>{index + 1}</td>
-                                        {Object.values(item).map((val, i) => (
-                                            <td key={i}>
-                                                {typeof val === "number" ? val.toFixed(2) : String(val)}
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div> */}
-
                 </div>
             )}
 

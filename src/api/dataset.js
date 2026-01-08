@@ -28,6 +28,16 @@ export const getDataset = async () => {
     }
 };
 
+export const getDatasetClassDistribution = async () => {
+    try {
+        const response = await axiosJWT.get(`/api/v1/dataset/penyakit-jantung/distribusi-kelas`, {});
+        return response.data;
+    } catch (error) {
+        console.error("Gagal mengambil data modeling:", error);
+        throw error.response?.data || { message: "Terjadi kesalahan koneksi" };
+    }
+};
+
 export const getDatasetStatistic = async () => {
     try {
         const response = await axiosJWT.get(`/api/v1/dataset/penyakit-jantung/statistik`, {});

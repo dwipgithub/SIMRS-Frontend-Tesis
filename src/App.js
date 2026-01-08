@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import LayoutAuth from "./components/LayoutAuth"
 import LayoutMain from "./components/LayoutMain"
+import TypingTables from "./components/TypingTables";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -13,6 +14,7 @@ function App() {
                 <Route path="/*" element={<LayoutMain/>}/>
             </Routes>
 
+            <TypingTables />
             <ToastContainer
                 position="top-right"
                 autoClose={3000}
