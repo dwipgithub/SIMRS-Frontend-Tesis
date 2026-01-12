@@ -10,6 +10,7 @@ import DatasetVariabel from "../pages/Dataset/Variabel"
 import EvaluasiModel from "../pages/EvaluasiModel/EvaluasiModel"
 import PelatihanModel from "../pages/PelatihanModel/PelatihanModel"
 import PeringkatFitur from "../pages/PeringkatFitur/PeringkatFitur";
+import PembersihanData from "../pages/PembersihanData/PembersihanData";
 
 const Content = () => {
     return (
@@ -22,6 +23,7 @@ const Content = () => {
                 <Route path="/dataset/variabel" element={<DatasetVariabel/>}/>
                 <Route path="/dataset/distribusi-kelas" element={<DatasetDistribusiKelas/>}/>
                 <Route path="/dataset/statistik" element={<Dataset/>}/>
+                <Route path="/model-klasifikasi/pembersihan-data" element={<PembersihanData/>}/>
                 <Route path="/model-klasifikasi/evaluasi-model" element={<EvaluasiModel/>}/>
                 <Route path="/model-klasifikasi/pelatihan-model" element={<PelatihanModel/>}/>
                 <Route path="/model-klasifikasi/peringkat-fitur" element={<PeringkatFitur/>}/>

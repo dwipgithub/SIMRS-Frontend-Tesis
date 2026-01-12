@@ -1990,18 +1990,28 @@ const PemeriksaanAwal = () => {
                                                             : "text-success"
                                                     }`}
                                                 >
-                                                    {prediksiResult.label}
+                                                    {prediksiResult.label || "N/A"}
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th style={{ padding: "2px" }}>Probabilitas</th>
                                             <td style={{ padding: "2px" }}>
-                                                {(parseFloat(prediksiResult.probability) * 100).toFixed(2)}%
+                                                {prediksiResult.probability || "0%"}
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
+
+                                {/* Interpretasi Klinis */}
+                                {prediksiResult.interpretasi_klinis && (
+                                    <div className="mt-3 p-3 border rounded bg-light">
+                                        <h6 className="fw-bold mb-2 small">Interpretasi Klinis</h6>
+                                        <p style={{ fontSize: "0.9rem", lineHeight: "1.6", marginBottom: 0 }}>
+                                            {prediksiResult.interpretasi_klinis}
+                                        </p>
+                                    </div>
+                                )}
         
                                 {/* ================================
                                     SWITCH TOGGLE DETAIL MANUAL

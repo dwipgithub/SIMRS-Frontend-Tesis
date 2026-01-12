@@ -24,10 +24,11 @@ const Sidebar = () => {
                     subMenus: [
                         { name: "Variabel", path: "/dataset/variabel", icon: "🗂️" },
                         { name: "Distribusi Kelas", path: "/dataset/distribusi-kelas", icon: "📊" },
-                        { name: "Statistik", path: "/dataset/statistik", icon: "📈" }
+                        { name: "Statistik", path: "/dataset/statistik", icon: "📈" },
+                        { name: "Peringkat Fitur", path: "/model-klasifikasi/peringkat-fitur", icon: "⭐" }
                     ],
                 },
-                { name: "Peringkat Fitur", path: "/model-klasifikasi/peringkat-fitur", icon: "⭐" },
+                { name: "Pembersihan Data", path: "/model-klasifikasi/pembersihan-data", icon: "🧹" },
                 { name: "Pelatihan Model", path: "/model-klasifikasi/pelatihan-model", icon: "🎯" },
                 { name: "Evaluasi Model", path: "/model-klasifikasi/evaluasi-model", icon: "📋" },
             ],

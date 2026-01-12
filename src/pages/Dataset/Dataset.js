@@ -1,26 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { getDataset, getDatasetStatistic } from "../../api/dataset";
+import { getDatasetStatistic } from "../../api/dataset";
 import { toast } from "react-toastify";
 
 const Dataset = () => {
-    const [datasetList, setDatasetList] = useState([]);
     const [datasetStatistic, setDatasetStatistic] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    const getData = async () => {
-        try {
-            const response = await getDataset();
-            if (response.data && Array.isArray(response.data)) {
-                setDatasetList(response.data);
-            } else {
-                setDatasetList([]);
-            }
-        } catch (err) {
-            toast.error(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const getDatasetStatisticData = async () => {
         try {
@@ -34,7 +18,6 @@ const Dataset = () => {
     };
 
     useEffect(() => {
-        getData();
         getDatasetStatisticData();
     }, []);
 
@@ -67,9 +50,9 @@ const Dataset = () => {
                     Memuat data...
                 </p>
             )}
-
+            
             {/* Hanya tampilkan tabel jika ada data */}
-            {!loading && datasetList.length > 0 && (
+            {datasetStatistic && Object.keys(datasetStatistic).length > 0 ? (
                 <div
                     className="table-responsive"
                     style={{
@@ -119,13 +102,8 @@ const Dataset = () => {
                         </table>
                     </div>
                 </div>
-            )}
-
-            {/* Pesan jika tidak ada data */}
-            {!loading && datasetList.length === 0 && (
-                <p className="text-muted" style={{ fontStyle: "italic" }}>
-                    Data belum tersedia.
-                </p>
+            ) : (
+                <div className="alert alert-info">Tidak ada data tersedia</div>
             )}
         </div>
     );

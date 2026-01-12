@@ -6,7 +6,7 @@ import TypingText from "../../components/TypingText";
 const Variabel = () => {
     const data = [
         { name: "Numerik", count: 9, fill: "#3b82f6" },
-        { name: "Biner", count: 5, fill: "#10b981" },
+        { name: "Biner", count: 4, fill: "#10b981" },
         { name: "Target", count: 1, fill: "#f59e0b" },
     ];
 
@@ -109,7 +109,7 @@ const Variabel = () => {
                                         borderRadius: "4px",
                                     }}
                                 />
-                                <span><TypingText text="Biner: 5 variabel" charDelay={40} startDelay={1000} /></span>
+                                <span><TypingText text="Biner: 4 variabel" charDelay={40} startDelay={1000} /></span>
                             </div>
                             <p style={{ fontSize: "0.9rem", color: "#6c757d", marginLeft: "30px" }}>
                                 <TypingText text="Variabel kategori dengan 2 nilai (0/1)" charDelay={30} startDelay={1300} />
@@ -150,7 +150,7 @@ const Variabel = () => {
                                 textAlign: "center",
                             }}
                         >
-                            <strong><TypingText text="Total: 15 variabel" charDelay={40} startDelay={2500} /></strong>
+                            <strong><TypingText text="Total: 14 variabel" charDelay={40} startDelay={2500} /></strong>
                         </div>
                     </div>
                 </div>
