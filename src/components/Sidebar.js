@@ -18,6 +18,7 @@ const Sidebar = () => {
             name: "Model Klasfikasi",
             icon: "🧠",
             subMenus: [
+                { name: "Pembersihan Data", path: "/model-klasifikasi/pembersihan-data", icon: "🧹" },
                 {
                     name: "Dataset",
                     icon: "📁",
@@ -28,7 +29,6 @@ const Sidebar = () => {
                         { name: "Peringkat Fitur", path: "/model-klasifikasi/peringkat-fitur", icon: "⭐" }
                     ],
                 },
-                { name: "Pembersihan Data", path: "/model-klasifikasi/pembersihan-data", icon: "🧹" },
                 { name: "Pelatihan Model", path: "/model-klasifikasi/pelatihan-model", icon: "🎯" },
                 { name: "Evaluasi Model", path: "/model-klasifikasi/evaluasi-model", icon: "📋" },
             ],
